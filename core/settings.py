@@ -10,23 +10,37 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import logging
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+logger = logging.getLogger(__name__)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!po+9eu)7njsf+lk_moxw!shr$g&7+k!832r$o010#38#mqaf6'
+SECRET_KEY = 'hhiugGIUT86GIU-!po+9eu)7njsf+lk_moxw!shr$g&7+k!832r$o010#38#mqaf6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+# Di dalam settings.py Django Anda
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'quran.codenest.id', '100.122.135.39']
 
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
+
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'Quran' / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+# Debug log: bantu verifikasi path saat startup
+logger.debug("STATIC_ROOT=%s | STATICFILES_DIRS=%s", STATIC_ROOT, STATICFILES_DIRS)
 
 # Application definition
 
@@ -48,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -111,13 +126,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'quran' / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
