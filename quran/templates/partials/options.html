@@ -1,0 +1,154 @@
+{% load static %}
+<!-- Settings Panel -->
+<div id="settingsOverlay" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity duration-300"></div>
+
+<div id="settingsPanel" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-slate-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 border-l border-slate-200 dark:border-slate-700 overflow-y-auto">
+   <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700">
+      <h5 class="font-semibold text-slate-800 dark:text-white">Pengaturan</h5>
+      <button id="closeSettings" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+         <i class="bi bi-x-lg text-lg"></i>
+      </button>
+   </div>
+   <div class="p-5 space-y-6">
+      <div>
+         <h6 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Tampilan</h6>
+         <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600 dark:text-slate-400">Mode Gelap</span>
+            <button id="darkModeSwitch" class="relative w-11 h-6 rounded-full transition-colors duration-200" style="background-color: #cbd5e1;">
+               <span class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200"></span>
+            </button>
+         </div>
+      </div>
+
+      <hr class="border-slate-200 dark:border-slate-700">
+
+      <div>
+         <h6 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Font Arab</h6>
+         <select id="fontSelector" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <option value="Amiri">Amiri</option>
+            <option value="Scheherazade New">Scheherazade New</option>
+            <option value="Lateef">Lateef</option>
+            <option value="Noto Naskh Arabic">Noto Naskh Arabic</option>
+            <option value="Reem Kufi">Reem Kufi</option>
+            <option value="Traditional Arabic">Traditional Arabic</option>
+            <option value="Me Quran">Me Quran</option>
+         </select>
+         <p id="fontSaved" class="text-[11px] text-emerald-500 mt-1.5 hidden"><i class="bi bi-check-circle me-0.5"></i> Tersimpan</p>
+      </div>
+
+      <div>
+         <h6 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Ukuran Font Arab</h6>
+         <div class="flex items-center gap-3">
+            <button id="fontDecrease" class="w-9 h-9 rounded-lg border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-bold flex items-center justify-center">A-</button>
+            <span id="fontSizeDisplay" class="text-sm font-medium text-slate-600 dark:text-slate-400 min-w-[64px] text-center">Medium</span>
+            <button id="fontIncrease" class="w-9 h-9 rounded-lg border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-bold flex items-center justify-center">A+</button>
+         </div>
+         <p id="fontSizeSaved" class="text-[11px] text-emerald-500 mt-1.5 hidden"><i class="bi bi-check-circle me-0.5"></i> Tersimpan</p>
+      </div>
+
+      <hr class="border-slate-200 dark:border-slate-700">
+
+      <div>
+         <h6 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Bookmark</h6>
+         <div id="bookmarkInfo" class="text-xs text-slate-500 dark:text-slate-400 mb-3 hidden">
+            <i class="bi bi-bookmark-fill text-emerald-500 me-1"></i>
+            <span id="bookmarkSurahName"></span>
+         </div>
+         <button id="bookmarkBtn" class="w-full px-4 py-2.5 rounded-xl border border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 font-medium text-sm transition-colors">
+            <i class="bi bi-bookmark me-1"></i> Lanjutkan Membaca
+         </button>
+      </div>
+   </div>
+</div>
+
+<!-- Floating Settings Button (only shown when header button not visible) -->
+<button id="openSettingsFab" class="fixed bottom-6 right-6 w-14 h-14 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 transition-all z-30 flex items-center justify-center md:hidden">
+   <i class="bi bi-gear-fill text-xl"></i>
+</button>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+   const panel = document.getElementById('settingsPanel');
+   const overlay = document.getElementById('settingsOverlay');
+   const openBtns = document.querySelectorAll('#openSettingsBtn, #openSettingsFab');
+   const closeBtn = document.getElementById('closeSettings');
+   const darkSwitch = document.getElementById('darkModeSwitch');
+
+   function openPanel() {
+      panel.classList.remove('translate-x-full');
+      overlay.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+   }
+   function closePanel() {
+      panel.classList.add('translate-x-full');
+      overlay.classList.add('hidden');
+      document.body.style.overflow = '';
+   }
+   openBtns.forEach(btn => btn?.addEventListener('click', openPanel));
+   closeBtn?.addEventListener('click', closePanel);
+   overlay?.addEventListener('click', closePanel);
+   document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closePanel();
+   });
+
+    if (darkSwitch) {
+       const updateSwitch = () => {
+          const isDark = document.documentElement.classList.contains('dark');
+          const thumb = darkSwitch.querySelector('span');
+          const bg = darkSwitch;
+          if (isDark) {
+             thumb.style.transform = 'translateX(20px)';
+             bg.style.backgroundColor = '#3b82f6';
+          } else {
+             thumb.style.transform = 'translateX(0)';
+             bg.style.backgroundColor = '#cbd5e1';
+          }
+       };
+       updateSwitch();
+    }
+    document.addEventListener('themeChanged', function() {
+       if (darkSwitch) updateSwitch();
+    });
+
+   function showSaved(el) {
+      if (!el) return;
+      el.classList.remove('hidden');
+      setTimeout(function() { el.classList.add('hidden'); }, 2000);
+   }
+
+   var fontSel = document.getElementById('fontSelector');
+   var fontDec = document.getElementById('fontDecrease');
+   var fontInc = document.getElementById('fontIncrease');
+   var savedMsg = document.getElementById('fontSaved');
+   var sizeSavedMsg = document.getElementById('fontSizeSaved');
+
+   if (fontSel) fontSel.addEventListener('change', function() { showSaved(savedMsg); });
+   if (fontDec) fontDec.addEventListener('click', function() { showSaved(sizeSavedMsg); });
+   if (fontInc) fontInc.addEventListener('click', function() { showSaved(sizeSavedMsg); });
+
+   function updateBookmarkInfo() {
+      var info = document.getElementById('bookmarkInfo');
+      var nameEl = document.getElementById('bookmarkSurahName');
+      if (!info || !nameEl) return;
+      try {
+         var surah = localStorage.getItem('lastSurah');
+         var ayah = localStorage.getItem('lastAyah');
+         if (surah) {
+            var name = 'Surah ' + surah;
+            if (typeof surahNames !== 'undefined') {
+               for (var i = 0; i < surahNames.length; i++) {
+                  if (surahNames[i].number == surah) { name = surahNames[i].name; break; }
+               }
+            }
+            nameEl.textContent = name + (ayah ? ' (Ayat ' + ayah + ')' : '');
+            info.classList.remove('hidden');
+         } else {
+            info.classList.add('hidden');
+         }
+      } catch(e) {}
+   }
+
+   updateBookmarkInfo();
+   document.addEventListener('bookmarkUpdated', updateBookmarkInfo);
+});
+</script>

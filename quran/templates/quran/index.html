@@ -1,0 +1,174 @@
+{% load static %}
+{% load quran_tags %}
+
+{% include 'partials/head.html' %}
+
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen flex flex-col transition-colors duration-200">
+
+{% include 'partials/header.html' %}
+
+<!-- Hero -->
+<section class="hero-gradient relative overflow-hidden">
+   <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+   <div class="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-16 relative">
+      <div class="text-center">
+         <h1 class="text-3xl md:text-5xl font-bold text-white mb-3">Al-Qur'an <span class="text-emerald-400">Online</span></h1>
+         <p class="text-slate-300 text-sm md:text-base max-w-xl mx-auto mb-6">Baca dan jelajahi Al-Qur'an dengan mudah, kapan saja dan di mana saja.</p>
+         <div id="continueReading" class="hidden mb-4">
+            <a id="continueLink" href="#" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-medium transition-colors shadow-lg shadow-emerald-500/20">
+               <i class="bi bi-bookmark-fill"></i> Lanjutkan Baca
+               <span id="continueInfo" class="text-emerald-100 text-xs"></span>
+            </a>
+         </div>
+         <div class="max-w-md mx-auto relative">
+            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="searchSurah" placeholder="Cari surah..." class="search-box w-full pl-11 pr-4 py-3 rounded-xl border-0 bg-white/10 backdrop-blur-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 text-sm">
+         </div>
+      </div>
+      <div class="grid grid-cols-3 gap-3 md:gap-6 max-w-lg mx-auto mt-8">
+         <div class="stat-card rounded-xl p-3 md:p-4 text-center">
+            <div class="text-2xl md:text-3xl font-bold text-emerald-400">{{ total_surahs }}</div>
+            <div class="text-xs md:text-sm text-slate-300 mt-1">Surah</div>
+         </div>
+         <div class="stat-card rounded-xl p-3 md:p-4 text-center">
+            <div class="text-2xl md:text-3xl font-bold text-emerald-400">{{ total_verses }}</div>
+            <div class="text-xs md:text-sm text-slate-300 mt-1">Ayat</div>
+         </div>
+         <div class="stat-card rounded-xl p-3 md:p-4 text-center">
+            <div class="text-2xl md:text-3xl font-bold text-emerald-400">30</div>
+            <div class="text-xs md:text-sm text-slate-300 mt-1">Juz</div>
+         </div>
+      </div>
+   </div>
+</section>
+
+<main class="flex-1 max-w-6xl mx-auto px-4 md:px-6 py-8 w-full">
+
+   {% if surahs %}
+      <div class="flex items-center justify-between mb-6">
+         <h2 class="text-lg font-semibold text-slate-800 dark:text-white">Daftar Surah</h2>
+         <span class="text-xs text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">{{ total_surahs }} surah</span>
+      </div>
+      <div id="surah-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+         {% for surah in surahs %}
+            {% with num=surah.number translit=surah.name_translit_id translation=surah.name_translation_id arabic=surah.name_arab_short verses=surah.number_of_verses revelation=surah.revelation %}
+            <a href="{% url 'surah_detail' num %}"
+               class="surah-card group bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-600 p-4 md:p-5 flex items-center gap-4">
+               <div class="w-11 h-11 md:w-12 md:h-12 flex-shrink-0 flex items-center justify-center rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 text-emerald-600 dark:text-emerald-400  text-sm surah-number group-hover:scale-110 transition-transform">
+               {{ num|arabic_num }}
+               </div>
+               <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-0.5">
+                     <h3 class="font-semibold text-sm md:text-base text-slate-800 dark:text-white truncate">{{ translit }}</h3>
+                     <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-full {% if revelation == 'Makkiyah' %}bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400{% else %}bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400{% endif %}">{{ revelation }}</span>
+                  </div>
+                  <p class="text-xs text-slate-400 dark:text-slate-500">{{ translation }} · {{ verses }} Ayat</p>
+               </div>
+               <div class="font-arabic text-2xl md:text-3xl text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors flex-shrink-0">
+                  {{ arabic }}
+               </div>
+            </a>
+            {% endwith %}
+         {% endfor %}
+      </div>
+   {% else %}
+      <div class="text-center py-20">
+         <i class="bi bi-exclamation-triangle text-4xl text-amber-400"></i>
+         <h4 class="text-lg font-semibold mt-4">Data Tidak Ditemukan</h4>
+         <p class="text-sm text-slate-400 mt-1">File data/quran.json tidak valid atau tidak ditemukan.</p>
+      </div>
+   {% endif %}
+</main>
+
+<!-- First-time tutorial overlay -->
+<div id="tutorialOverlay" class="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+   <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8 relative">
+      <div class="text-center mb-6">
+         <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+            <i class="bi bi-book-half text-3xl text-white"></i>
+         </div>
+         <h2 class="text-xl font-bold text-slate-800 dark:text-white">Selamat Datang!</h2>
+         <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Berikut panduan singkat menggunakan Al-Qur'an Online:</p>
+      </div>
+      <div class="space-y-4">
+         <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
+            <div>
+               <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Pilih Surah</p>
+               <p class="text-xs text-slate-500 dark:text-slate-400">Klik salah satu surah untuk mulai membaca ayat-ayatnya.</p>
+            </div>
+         </div>
+         <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
+            <div>
+               <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Bookmark Ayat</p>
+               <p class="text-xs text-slate-500 dark:text-slate-400">Klik ikon bookmark pada ayat untuk menyimpan posisi baca terakhir.</p>
+            </div>
+         </div>
+         <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
+            <div>
+               <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Atur Tampilan</p>
+               <p class="text-xs text-slate-500 dark:text-slate-400">Buka panel pengaturan (<i class="bi bi-gear-fill text-xs"></i>) untuk ganti tema, font Arab, dan ukuran tulisan.</p>
+            </div>
+         </div>
+         <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold flex-shrink-0">4</div>
+            <div>
+               <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Lanjutkan Baca</p>
+               <p class="text-xs text-slate-500 dark:text-slate-400">Tombol bookmark di panel pengaturan atau di halaman surah akan membawa Anda ke ayat terakhir yang dibaca.</p>
+            </div>
+         </div>
+      </div>
+      <button id="tutorialDone" class="w-full mt-6 px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium text-sm transition-colors shadow-lg shadow-emerald-500/20">
+         <i class="bi bi-check-lg me-1"></i> Mulai Membaca
+      </button>
+   </div>
+</div>
+
+{% include 'partials/options.html' %}
+{% include 'partials/footer.html' %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+var surahNames = [{% for surah in surahs %}{'number':{{ surah.number }},'name':'{{ surah.name_translit_id|escapejs }}'}{% if not forloop.last %},{% endif %}{% endfor %}];
+
+$(document).ready(function() {
+   $('#searchSurah').on('keyup', function() {
+      var value = $(this).val().toLowerCase();
+      $('#surah-grid a').filter(function() {
+         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+   });
+});
+
+try {
+   var ls = localStorage.getItem('lastSurah');
+   var la = localStorage.getItem('lastAyah');
+   if (ls) {
+      var name = 'Surah ' + ls;
+      for (var i = 0; i < surahNames.length; i++) {
+         if (surahNames[i].number == ls) { name = surahNames[i].name; break; }
+      }
+      document.getElementById('continueReading').classList.remove('hidden');
+      document.getElementById('continueLink').href = '{% url 'index' %}surah/' + encodeURIComponent(ls) + (la ? '&ayah=' + encodeURIComponent(la) : '');
+      document.getElementById('continueInfo').textContent = '- ' + name + (la ? ' (Ayat ' + la + ')' : '');
+   }
+} catch(e) {}
+
+try {
+   if (!localStorage.getItem('tutorialDone')) {
+      document.getElementById('tutorialOverlay').classList.remove('hidden');
+   }
+   document.getElementById('tutorialDone')?.addEventListener('click', function() {
+      document.getElementById('tutorialOverlay').classList.add('hidden');
+      localStorage.setItem('tutorialDone', '1');
+   });
+} catch(e) {}
+</script>
+<script src="{% static 'js/dark.js' %}?v=2"></script>
+<script src="{% static 'js/search.js' %}?v=2"></script>
+<script src="{% static 'js/option.js' %}?v=2"></script>
+
+</body>
+</html>

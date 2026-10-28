@@ -1,0 +1,118 @@
+{% load static %}
+{% load quran_tags %}
+
+
+{% include 'partials/head.html' %}
+
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen flex flex-col transition-colors duration-200">
+
+{% include 'partials/header.html' %}
+
+{% if surah_data %}
+
+<!-- Surah Header -->
+<section class="hero-gradient relative overflow-hidden">
+   <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+   <div class="max-w-4xl mx-auto px-4 md:px-6 py-10 md:py-14 relative">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+         <div class="text-center md:text-left">
+            <div class="flex items-center gap-3 justify-center md:justify-start mb-2">
+               <span class="text-3xl md:text-4xl font-arabic text-emerald-400">{{ surah_data.name_arab_short }}</span>
+            </div>
+            <h1 class="text-xl md:text-3xl font-bold text-white">{{ surah_data.name_translit_id }}</h1>
+            <p class="text-slate-300 text-xs md:text-sm mt-0.5">{{ surah_data.name_translation_id }} · {{ surah_data.number_of_verses }} Ayat · {{ surah_data.revelation }}</p>
+         </div>
+         <div class="flex items-center gap-2">
+            <button id="load-bookmark-btn" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs md:text-sm font-medium transition-colors shadow-lg shadow-emerald-500/20">
+               <i class="bi bi-bookmark-fill me-1"></i> Lanjutkan Baca
+            </button>
+         </div>
+      </div>
+      <div class="flex items-center justify-between mt-6 gap-3">
+         {% if prev_surah %}
+            <a href="{% url 'surah_detail' prev_surah %}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm transition-colors backdrop-blur-sm">
+               <i class="bi bi-chevron-right me-1"></i> {% for s in surahs %}{% if s.number == prev_surah %}{{ s.name_translit_id }}{% endif %}{% endfor %}
+            </a>
+         {% else %}<div></div>{% endif %}
+         {% if next_surah %}
+            <a href="{% url 'surah_detail' next_surah %}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm transition-colors backdrop-blur-sm">
+               {% for s in surahs %}{% if s.number == next_surah %}{{ s.name_translit_id }}{% endif %}{% endfor %} <i class="bi bi-chevron-left me-1"></i>
+            </a>
+         {% else %}<div></div>{% endif %}
+      </div>
+   </div>
+</section>
+
+<main class="flex-1 max-w-4xl mx-auto px-4 md:px-6 py-6 w-full">
+   {% for verse in surah_data.verses.all %}
+   <div id="verse-{{ verse.number_in_surah }}" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm mb-4 overflow-hidden" data-surah="{{ surah_data.number }}" data-ayah="{{ verse.number_in_surah }}">
+      <!-- Ayah Header -->
+      <div class="flex items-center justify-between px-4 md:px-6 pt-4 pb-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700">
+         <div class="flex items-center gap-2">
+            <div class="relative w-10 h-10 flex-shrink-0">
+               <img src="{% static 'images/segi8.png' %}" width="40" height="40" class="w-10 h-10" alt="">
+               <span class="absolute inset-0 flex items-center justify-center text-xs font-bold text-slate-700 dark:text-slate-300 surah-number">{{ verse.number_in_surah|arabic_num }}</span>
+            </div>
+            <span class="text-xs text-slate-400 dark:text-slate-500">Ayat {{ verse.number_in_surah }}</span>
+         </div>
+         <button class="bookmark-ayah text-slate-400 hover:text-emerald-500 transition-colors p-1" data-surah="{{ surah_data.number }}" data-ayah="{{ verse.number_in_surah }}">
+            <i class="bi bi-bookmark-plus" style="font-size: 2rem;"></i>
+         </button>
+      </div>
+      <!-- Arabic Text -->
+      <div class="px-4 md:px-6 py-5 text-right">
+         <p class="font-arabic text-2xl md:text-3xl lg:text-4xl leading-[2.2] text-slate-800 dark:text-slate-100" dir="rtl">{{ verse.text_arab|safe }}</p>
+      </div>
+      <!-- Transliteration & Translation -->
+      <div class="px-4 md:px-6 pb-5 space-y-3">
+         <div>
+            <span class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Latin</span>
+            <p class="text-sm text-slate-600 dark:text-slate-400 italic mt-0.5">{{ verse.translit_en }}</p>
+         </div>
+         <div>
+            <span class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Terjemahan</span>
+            <p class="text-sm text-slate-700 dark:text-slate-300 mt-0.5">{{ verse.translation_id }}</p>
+         </div>
+      </div>
+   </div>
+   {% endfor %}
+
+   <!-- Bottom Navigation -->
+   <div class="flex items-center justify-between gap-3 mt-6 mb-10">
+      {% if prev_surah %}
+         <a href="{% url 'surah_detail' prev_surah %}" class="flex-1 px-5 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-600 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all shadow-sm text-center">
+            <i class="bi bi-arrow-left me-1"></i> Surah Sebelumnya
+         </a>
+      {% endif %}
+      <a href="{% url 'index' %}" class="flex-1 px-5 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-medium transition-all shadow-sm text-center">
+         <i class="bi bi-grid-fill me-1"></i> Daftar Surah
+      </a>
+      {% if next_surah %}
+         <a href="{% url 'surah_detail' next_surah %}" class="flex-1 px-5 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-600 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all shadow-sm text-center">
+            Surah Selanjutnya <i class="bi bi-arrow-right me-1"></i>
+         </a>
+      {% endif %}
+   </div>
+</main>
+
+{% else %}
+<main class="flex-1 max-w-6xl mx-auto px-4 md:px-6 py-20 text-center w-full">
+   <i class="bi bi-exclamation-triangle text-5xl text-amber-400"></i>
+   <h1 class="text-2xl font-bold mt-4 text-slate-800 dark:text-white">Surah tidak ditemukan</h1>
+   <a href="{% url 'index' %}" class="inline-block mt-4 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl transition-colors">Kembali ke Beranda</a>
+</main>
+{% endif %}
+
+{% include 'partials/options.html' %}
+{% include 'partials/footer.html' %}
+
+<script>
+var surahNames = [{% for s in surahs %}{'number':{{ s.number }},'name':'{{ s.name_translit_id|escapejs }}'}{% if not forloop.last %},{% endif %}{% endfor %}];
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="{% static 'js/dark.js' %}?v=2"></script>
+<script src="{% static 'js/bookmark.js' %}?v=2"></script>
+<script src="{% static 'js/option.js' %}?v=2"></script>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+{% load static %}
+<header class="sticky top-0 z-50 backdrop-blur-lg bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-700">
+   <div class="max-w-6xl mx-auto px-4 md:px-6">
+      <div class="flex items-center justify-between h-16">
+         <a href="{% url 'index' %}" class="flex items-center gap-3">
+            <img src="{% static 'images/logoquran.png' %}" width="40" height="40" class="rounded-lg" alt="">
+            <span class="text-xl font-bold text-slate-800 dark:text-white">Quran <span class="text-primary-500">Kareem</span></span>
+         </a>
+         <nav class="flex items-center gap-1 md:gap-2">
+            <a href="#" class="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary-500 dark:hover:text-primary-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Hadist</a>
+            <a href="{% url 'credit' %}" class="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary-500 dark:hover:text-primary-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Credit</a>
+            <button id="openSettingsBtn" class="ml-2 p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Pengaturan">
+               <i class="bi bi-gear-fill text-lg"></i>
+            </button>
+         </nav>
+      </div>
+   </div>
+</header>

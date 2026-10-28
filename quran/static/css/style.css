@@ -1,0 +1,71 @@
+@font-face {
+   font-family: 'Sinbad';
+   src: url('../fonts/SinbadtheSailor.ttf') format('truetype');
+   font-weight: normal;
+   font-style: normal;
+}
+
+html {
+   scroll-behavior: smooth;
+}
+
+body {
+   font-family: 'Inter', sans-serif;
+}
+
+.font-arabic {
+   font-family: 'Amiri', serif;
+}
+
+.surah-card {
+   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.surah-card:hover {
+   transform: translateY(-4px);
+}
+
+.surah-number {
+   font-family: 'Inter', sans-serif;
+}
+
+.loading-text {
+   font-family: 'Sinbad', sans-serif;
+   font-size: 20px;
+   text-align: center;
+   margin-top: 20px;
+   white-space: nowrap;
+   overflow: hidden;
+   width: 0;
+   display: inline-block;
+   border-right: 2px solid transparent;
+   animation: typing 2s steps(10, end) infinite alternate;
+}
+
+@keyframes typing {
+   from { width: 0; }
+   to { width: 210px; }
+}
+
+.search-box:focus {
+   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.hero-gradient {
+   background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+}
+
+.dark .hero-gradient {
+   background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%);
+}
+
+.stat-card {
+   backdrop-filter: blur(8px);
+   background: rgba(255, 255, 255, 0.1);
+   border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.dark .stat-card {
+   background: rgba(255, 255, 255, 0.05);
+   border: 1px solid rgba(255, 255, 255, 0.08);
+}
