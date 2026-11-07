@@ -31,3 +31,7 @@ staticfiles/
 
 # Node/npm if any
 node_modules/
+
+# Environment variables (jangan commit!)
+.env
+

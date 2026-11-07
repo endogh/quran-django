@@ -11,11 +11,18 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import logging
+import os
 
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Muat variabel lingkungan dari file .env (jika ada).
+load_dotenv(BASE_DIR / '.env')
+
 logger = logging.getLogger(__name__)
 
 # Quick-start development settings - unsuitable for production
@@ -30,17 +37,44 @@ DEBUG = False
 # Di dalam settings.py Django Anda
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'quran.codenest.id', '100.122.135.39']
 
+# Aplikasi diakses di belakang nginx/CDN. IP asli visitor diambil langsung
+# dari header X-Forwarded-For di middleware, jadi USE_X_FORWARDED_HOST tidak
+# diperlukan (dan bisa menyebabkan host mismatch saat CSRF).
+#
+# Jika nginx/CDN mengakhiri HTTPS, beri tahu Django bahwa request aslinya HTTPS.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Origin yang diizinkan untuk request POST (login admin, dsb.).
+# Bisa diubah lewat .env (pisahkan dengan koma).
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        'CSRF_TRUSTED_ORIGINS',
+        'https://quran.codenest.id,http://quran.codenest.id',
+    ).split(',')
+    if origin.strip()
+]
+
+# --- Dashboard statistik visitor ---
+# Token & path rahasia dibaca dari file .env (lihat .env.example).
+STATS_SECRET_KEY = os.getenv('STATS_SECRET_KEY', '')
+STATS_URL = os.getenv('STATS_URL', 'stats').strip('/')
+
+# Simpan log kunjungan selama N hari, lalu dibersihkan otomatis.
+STATS_RETENTION_DAYS = int(os.getenv('STATS_RETENTION_DAYS', '90'))
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'Quran' / 'static']
+# File statis aplikasi ditemukan otomatis dari quran/static lewat
+# AppDirectoriesFinder (karena 'quran' ada di INSTALLED_APPS).
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # Debug log: bantu verifikasi path saat startup
-logger.debug("STATIC_ROOT=%s | STATICFILES_DIRS=%s", STATIC_ROOT, STATICFILES_DIRS)
+logger.debug("STATIC_ROOT=%s", STATIC_ROOT)
 
 # Application definition
 
@@ -63,6 +97,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    'quran.middleware.TrackVisitsMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -120,7 +155,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Jakarta'
 
 USE_I18N = True
 

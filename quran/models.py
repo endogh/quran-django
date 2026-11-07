@@ -30,3 +30,41 @@ class Verse(models.Model):
     def __str__(self):
         return f"{self.surah.number}:{self.number_in_surah}"
 
+
+class IPGeoCache(models.Model):
+    """Cache hasil lookup IP -> negara agar API tidak dipanggil berulang."""
+
+    ip = models.CharField(max_length=45, unique=True)
+    country_code = models.CharField(max_length=2, blank=True)
+    country_name = models.CharField(max_length=100, blank=True)
+    resolved_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Cache Geo IP'
+        verbose_name_plural = 'Cache Geo IP'
+
+    def __str__(self):
+        return f"{self.ip} -> {self.country_name or 'Tidak diketahui'}"
+
+
+class AccessLog(models.Model):
+    """Catatan setiap kunjungan halaman (untuk statistik visitor)."""
+
+    ip = models.CharField(max_length=45, db_index=True)
+    country_code = models.CharField(max_length=2, blank=True)
+    country_name = models.CharField(max_length=100, blank=True)
+    path = models.CharField(max_length=255)
+    user_agent = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Log Akses'
+        verbose_name_plural = 'Log Akses'
+        indexes = [
+            models.Index(fields=['country_code']),
+        ]
+
+    def __str__(self):
+        return f"{self.ip} {self.path} {self.created_at:%Y-%m-%d %H:%M}"
+
