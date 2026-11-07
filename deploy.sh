@@ -95,11 +95,13 @@ for item in data:
   fi
 
   candidates+=(
+    # Venv bersama di luar folder project (dipakai di server: /opt/.venv).
+    "/opt/.venv"
+    "$PROJECT_DIR/../.venv"
     "$PROJECT_DIR/.venv"
     "$PROJECT_DIR/venv"
-    "$PROJECT_DIR/.Quranvenv"
-    "$PROJECT_DIR/../.venv"
     "/opt/venv"
+    "$PROJECT_DIR/.Quranvenv"
   )
   for dir in "${candidates[@]}"; do
     if [ -x "$dir/bin/python" ]; then

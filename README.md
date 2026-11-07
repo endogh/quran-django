@@ -124,7 +124,7 @@ Yang dilakukan script:
 
 0. Jika folder belum berupa repo git (mis. hasil upload manual), script otomatis `git init` + fetch + checkout, dan membackup `.env` & `db.sqlite3` ke `../deploy-backup-<timestamp>/`.
 1. `git fetch` + `git reset --hard origin/main` (perubahan lokal di-auto-stash).
-2. Deteksi virtualenv otomatis (`.venv`, `venv`, `.Quranvenv`, `../.venv`, `/opt/venv`).
+2. Deteksi virtualenv otomatis: prioritaskan venv yang dipakai PM2, lalu `/opt/.venv` (venv bersama di server), `.venv`, `venv`, `../.venv`, `/opt/venv`.
 3. `pip install -r requirements.txt`.
 4. Backup `db.sqlite3` ke `backups/` (menyimpan 10 backup terbaru).
 5. `migrate`, `collectstatic`, dan `purge_access_logs`.
