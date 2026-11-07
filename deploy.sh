@@ -3,7 +3,7 @@
 # deploy.sh — deploy otomatis quran-django dari GitHub.
 #
 # Cara pakai di server:
-#   cd /opt/quran        # folder project (berisi file ini)
+#   cd /opt/Quran        # folder project (berisi file ini)
 #   ./deploy.sh
 #
 # Opsi lewat environment variable (opsional):
@@ -15,7 +15,7 @@
 set -euo pipefail
 
 APP_NAME="quran-django"
-REPO_URL="https://github.com/endogh/quran-django.git"
+REPO_URL="${REPO_URL:-https://github.com/endogh/quran-django.git}"
 BRANCH="${BRANCH:-main}"
 PM2_APP="${PM2_APP:-$APP_NAME}"
 SYSTEMD_SERVICE="${SYSTEMD_SERVICE:-$APP_NAME}"
@@ -32,16 +32,25 @@ ok()    { echo -e "${c_green}[ok]${c_reset} $*"; }
 warn()  { echo -e "${c_yellow}[warn]${c_reset} $*"; }
 fail()  { echo -e "${c_red}[error]${c_reset} $*" >&2; exit 1; }
 
-# ---------- 0. cek git ----------
+# ---------- 0. cek git / bootstrap ----------
 command -v git >/dev/null 2>&1 || fail "git tidak ditemukan."
 if [ ! -d .git ]; then
-  info "Folder ini belum berupa repo git. Clone dari GitHub..."
-  [ -n "$(ls -A . 2>/dev/null | grep -v '^deploy.sh$' || true)" ] \
-    && fail "Folder tidak kosong. Kosongkan dulu atau clone manual: git clone $REPO_URL ."
+  info "Folder ini belum berupa repo git. Inisialisasi & ambil kode dari GitHub..."
+  # Amankan file yang tidak ada di repo sebelum checkout menimpa source lama.
+  BOOTSTRAP_BACKUP="${BOOTSTRAP_BACKUP_DIR:-$PROJECT_DIR/../deploy-backup-$(date +%Y%m%d-%H%M%S)}"
+  mkdir -p "$BOOTSTRAP_BACKUP"
+  for f in .env db.sqlite3; do
+    [ -e "$f" ] && cp -a "$f" "$BOOTSTRAP_BACKUP/"
+  done
+  ok "Backup file lokal (jika ada): $BOOTSTRAP_BACKUP"
+
   git init -q
-  git remote add origin "$REPO_URL"
+  git remote add origin "$REPO_URL" 2>/dev/null || git remote set-url origin "$REPO_URL"
   git fetch origin "$BRANCH"
-  git checkout -B "$BRANCH" "origin/$BRANCH"
+  # -f menimpa source lama dengan versi repo; file .env/db.sqlite3/media
+  # tidak ada di repo sehingga tetap aman.
+  git checkout -f -B "$BRANCH" "origin/$BRANCH"
+  ok "Repo git berhasil diinisialisasi."
 fi
 
 if ! git remote get-url origin >/dev/null 2>&1; then

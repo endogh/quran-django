@@ -116,12 +116,13 @@ python manage.py createsuperuser
 Repo ini menyertakan `deploy.sh` untuk deploy otomatis dari GitHub:
 
 ```bash
-cd /opt/quran
+cd /opt/Quran
 ./deploy.sh
 ```
 
 Yang dilakukan script:
 
+0. Jika folder belum berupa repo git (mis. hasil upload manual), script otomatis `git init` + fetch + checkout, dan membackup `.env` & `db.sqlite3` ke `../deploy-backup-<timestamp>/`.
 1. `git fetch` + `git reset --hard origin/main` (perubahan lokal di-auto-stash).
 2. Deteksi virtualenv otomatis (`.venv`, `venv`, `.Quranvenv`, `../.venv`, `/opt/venv`).
 3. `pip install -r requirements.txt`.
@@ -133,6 +134,7 @@ Opsi environment:
 
 ```bash
 BRANCH=main ./deploy.sh
+REPO_URL=git@github.com:endogh/quran-django.git ./deploy.sh
 VENV_DIR=/path/venv ./deploy.sh
 PM2_APP=quran-django ./deploy.sh
 SKIP_BACKUP=1 ./deploy.sh
@@ -141,7 +143,7 @@ SKIP_BACKUP=1 ./deploy.sh
 ### Contoh konfigurasi nginx
 
 ```nginx
-location /static/ { alias /opt/quran/staticfiles/; }
+location /static/ { alias /opt/Quran/staticfiles/; }
 location / {
     proxy_pass http://127.0.0.1:7000;
     proxy_set_header Host $host;
@@ -154,7 +156,7 @@ location / {
 ### Cron pembersihan log (opsional)
 
 ```cron
-0 3 * * * cd /opt/quran && /path/venv/bin/python manage.py purge_access_logs
+0 3 * * * cd /opt/Quran && /path/venv/bin/python manage.py purge_access_logs
 ```
 
 ## Endpoint Penting
