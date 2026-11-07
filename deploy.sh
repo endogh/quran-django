@@ -74,6 +74,26 @@ ok "Kode diperbarui ke $(git rev-parse --short HEAD) — $(git log -1 --pretty=%
 find_python() {
   local candidates=()
   [ -n "${VENV_DIR:-}" ] && candidates+=("$VENV_DIR")
+
+  # Prioritaskan venv yang benar-benar dipakai PM2 untuk app ini.
+  if command -v pm2 >/dev/null 2>&1; then
+    local pm2_bin
+    pm2_bin="$(pm2 jlist 2>/dev/null | python3 -c 'import json, sys
+app = sys.argv[1]
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+for item in data:
+    if item.get("name") == app:
+        path = item.get("pm2_env", {}).get("pm_exec_path", "")
+        if "/bin/" in path:
+            print(path.rsplit("/", 2)[0])
+        break
+' "$PM2_APP" 2>/dev/null || true)"
+    [ -n "$pm2_bin" ] && candidates+=("$pm2_bin")
+  fi
+
   candidates+=(
     "$PROJECT_DIR/.venv"
     "$PROJECT_DIR/venv"
