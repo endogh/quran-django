@@ -151,7 +151,7 @@ try {
          if (surahNames[i].number == ls) { name = surahNames[i].name; break; }
       }
       document.getElementById('continueReading').classList.remove('hidden');
-      document.getElementById('continueLink').href = '{% url 'index' %}surah/' + encodeURIComponent(ls) + (la ? '&ayah=' + encodeURIComponent(la) : '');
+      document.getElementById('continueLink').href = '{% url 'index' %}surah/' + encodeURIComponent(ls) + '/' + (la ? '?ayah=' + encodeURIComponent(la) : '');
       document.getElementById('continueInfo').textContent = '- ' + name + (la ? ' (Ayat ' + la + ')' : '');
    }
 } catch(e) {}
