@@ -125,7 +125,7 @@
 {{ countries|json_script:"countries-data" }}
 {{ top_pages|json_script:"pages-data" }}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{% static 'vendor/chart.js/chart.umd.js' %}"></script>
 <script>
 (function () {
     function data(id) {

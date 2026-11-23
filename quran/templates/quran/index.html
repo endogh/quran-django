@@ -129,7 +129,7 @@
 {% include 'partials/options.html' %}
 {% include 'partials/footer.html' %}
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
 <script>
 var surahNames = [{% for surah in surahs %}{'number':{{ surah.number }},'name':'{{ surah.name_translit_id|escapejs }}'}{% if not forloop.last %},{% endif %}{% endfor %}];
 

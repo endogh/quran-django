@@ -25,7 +25,7 @@ Live: <https://quran.codenest.id>
 - Python 3 · Django 6.1
 - SQLite
 - Gunicorn
-- Tailwind CSS (CDN) · Bootstrap Icons · Chart.js
+- Tailwind CSS (build lokal) · Bootstrap Icons · Chart.js · jQuery · font self-host (`@fontsource`)
 - `requests` untuk lookup geo IP (ip-api.com)
 - `python-dotenv` untuk konfigurasi `.env`
 
@@ -41,8 +41,11 @@ quran-django/
 │   ├── urls.py
 │   ├── management/commands/
 │   │   └── purge_access_logs.py
-│   ├── static/              # css, js, font, gambar
+│   ├── static/              # css, js, font, gambar (termasuk css/tailwind.css hasil build)
 │   └── templates/quran/     # index, surah, credit, stats, sitemap.xml
+├── src/tailwind.css         # input Tailwind (@tailwind ...)
+├── tailwind.config.js       # konfigurasi + daftar file yang dipindai
+├── package.json             # script build/watch Tailwind
 ├── deploy.sh                # deploy otomatis dari GitHub
 ├── requirements.txt
 ├── .env.example
@@ -52,6 +55,7 @@ quran-django/
 ## Prasyarat
 
 - Python 3.10+ (disarankan 3.12+)
+- Node.js 18+ & npm (hanya untuk membangun ulang CSS Tailwind)
 - Git
 
 ## Instalasi Lokal
@@ -75,6 +79,34 @@ python manage.py runserver
 Buka <http://127.0.0.1:8000/>.
 
 > Data surah/ayat diambil dari [github.com/gadingnst/quran-api](https://github.com/gadingnst/quran-api). Jika database belum berisi data, impor terlebih dahulu sebelum aplikasi digunakan.
+
+## Tailwind CSS
+
+Tailwind tidak lagi dimuat dari CDN. File `quran/static/css/tailwind.css` sudah ikut ter-commit, jadi ** server produksi tidak perlu npm** — cukup `collectstatic` seperti biasa.
+
+Build ulang CSS hanya perlu dilakukan saat mengubah class di template/JS atau konfigurasi Tailwind:
+
+```bash
+npm install          # sekali saat setup (node_modules tidak ikut git)
+npm run build        # hasilkan quran/static/css/tailwind.css (minified)
+npm run watch        # build otomatis saat file berubah (saat development)
+```
+
+Daftar file yang dipindai ada di `tailwind.config.js` (`quran/templates/**`, `quran/static/js/**`, dan file Python di `quran/`). Class yang dibuat dinamis dari JS harus tertulis literal di file tersebut agar ikut ter-build.
+
+### Aset lain (juga self-host)
+
+Semua aset yang sebelumnya dimuat dari CDN sudah disimpan lokal di `quran/static/`:
+
+| Aset | Path lokal | Sumber npm |
+| --- | --- | --- |
+| Bootstrap Icons | `vendor/bootstrap-icons/` | `bootstrap-icons@1.11.3` |
+| Chart.js | `vendor/chart.js/chart.umd.js` | `chart.js@4.4.1` |
+| jQuery | `vendor/jquery/jquery.min.js` | `jquery@3.7.1` |
+| Font (Inter, Amiri, Scheherazade New, Lateef, Noto Naskh Arabic, Reem Kufi) | `css/fonts.css` + `fonts/` | `@fontsource/*` |
+| Avatar/logo di halaman Credit | `images/credits/` | diunduh sekali dari sumber asal |
+
+Untuk memperbarui aset vendor, jalankan `npm install`, lalu salin file yang bersangkutan dari `node_modules/` ke path di atas. Font dapat di-generate ulang dari CSS `@fontsource/<nama>/<weight>.css` dengan mengubah path `./files/` menjadi `../fonts/`.
 
 ## Konfigurasi `.env`
 
